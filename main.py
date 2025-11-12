@@ -20,10 +20,11 @@ class ScrollLabel(QScrollArea):
         self.label.setWordWrap(True)
         lay.addWidget(self.label)
 
-    def setText(self, text):
+    def setText(self, text, autoscroll = True):
         self.label.setText(text)
-        #self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
-        #self.scroll_area.verticalScrollBar().setValue(self.scroll_area.verticalScrollBar().maximum())
+
+        if autoscroll:
+            self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
 
     def text(self):
         get_text = self.label.text()
@@ -34,29 +35,40 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("RuneEscape2")
-        self.setFixedSize(QSize(640, 400))
+        self.setMinimumSize(QSize(640, 400))
 
-        button = QPushButton("Run Account")
-        button.clicked.connect(self.runAccount)
+        button = QPushButton("Login to Account")
+        button.clicked.connect(self.loginAccount)
 
-        self.debug = ScrollLabel()
-        text = ""
-        for n in range(100):
-            text += str(n) + "\n"
-        self.debug.setText(text)
+        self.logWidget = ScrollLabel()
+        self.logWidget.setStyleSheet("QScrollArea { background-color: #BBBBBB; }")
 
         layout = QVBoxLayout()
         layout.addWidget(button)
-        layout.addWidget(self.debug)
+        layout.addWidget(self.logWidget)
 
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
 
+        self.log("Booting...")
+
+    def log(self, data):
+        self.logWidget.setText(self.logWidget.text() + "\n" + data)
+
     # [BUG] [TODO] Verify first if that account is already open, otherwise skip or make active
-    def runAccount(self, name):
+    def loginAccount(self, name):
         name = "izrbuz"
-        subprocess.run(["C:\\Program Files\\Sandboxie-Plus\\Start.exe", "/box:" + name, "C:\\Program Files (x86)\\Jagex Launcher\\JagexLauncher.exe"])
+        self.log(f"Logging into account {name}")
+
+        #subprocess.run(["C:\\Program Files\\Sandboxie-Plus\\Start.exe", "/box:" + name, "C:\\Program Files (x86)\\Jagex Launcher\\JagexLauncher.exe"])
+        cmd = ["C:\\Program Files\\Sandboxie-Plus\\Start.exe", "/box:" + name, "C:\\Program Files (x86)\\Jagex Launcher\\JagexLauncher.exe"]
+
+        try:
+            result = subprocess.run(cmd, capture_output = True, text = True, check = True)
+            self.log("Login Success")
+        except subprocess.CalledProcessError as e:
+            self.log(f"Login failed with error: {e}")
 
 app = QApplication(sys.argv)
 
