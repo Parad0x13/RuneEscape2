@@ -18,6 +18,8 @@ import win32con
 import win32api
 import win32ui
 
+from win11toast import toast, notify
+
 TICK = 0.6    # A standard RuneScape 'tick' is exactly 0.6 seconds long
 
 # Setup the event listener to kill the software entirely
@@ -209,6 +211,7 @@ class MainWindow(QMainWindow):
         window_title = self.accounts.currentText()
 
         if self.rsManager.activateWindow(window_title):
+            notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
             time.sleep(3.0)    # Give time to move mouse to mining position
             pos = pyautogui.position()
             while True:
@@ -216,11 +219,14 @@ class MainWindow(QMainWindow):
                     pyautogui.leftClick(pos)
                     time.sleep(TICK * 4)
                 pyautogui.write("=")
+        else:
+            notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
 
     def doCombat(self):
         window_title = self.accounts.currentText()
 
         if self.rsManager.activateWindow(window_title):
+            notify("Starting Combat", audio = {"silent": "true"})
             time.sleep(1.0)    # Generic get-ready wait
 
             while True:
@@ -231,6 +237,8 @@ class MainWindow(QMainWindow):
                 time.sleep(0.1)
                 pyautogui.press("subtract")
                 time.sleep(6.0)
+        else:
+            notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
 
 app = QApplication(sys.argv)
 
