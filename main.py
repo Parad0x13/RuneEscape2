@@ -1,10 +1,26 @@
+import os
 import sys
+import time
 import subprocess
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QLineEdit, QScrollArea, QComboBox
 
+#import pyautogui
 import pygetwindow
+
+import pynput
+import pyautogui
+
+# Setup the event listener to kill the software entirely
+def on_exit_hotkey(): os._exit(0)    # Nice way to kill this thread and all unrelated threads
+def for_canonical(f):
+    return lambda k: f(exitListener.canonical(k))
+
+hotkey = pynput.keyboard.HotKey(pynput.keyboard.HotKey.parse("<esc>"), on_exit_hotkey)    # "<ctrl>+<alt>+h" or something like that
+exitListener = pynput.keyboard.Listener(on_press = for_canonical(hotkey.press), on_release = for_canonical(hotkey.release))
+exitListener.start()
+# End exit event listener setup
 
 class ScrollLabel(QScrollArea):
     def __init__(self, *args, **kwargs):
@@ -37,7 +53,6 @@ class RSManager():
         print("Creating RuneScape Manager")
 
     def discover(self):
-        print("Disovering RuneScape Launchers and Clients")
         self.launchers = pygetwindow.getWindowsWithTitle("Jagex Launcher")
         self.clients = pygetwindow.getWindowsWithTitle("RuneScape")
 
@@ -55,7 +70,9 @@ class RSManager():
 
         try:
             if window:
+                window.restore()
                 window.activate()
+                window.maximize()    # [TODO] Should only maximized if it was already maximized
         except:    # [TODO] Probably window was removed at some point, they will need to be purged
             pass
 
@@ -79,10 +96,14 @@ class MainWindow(QMainWindow):
         self.logWidget = ScrollLabel()
         self.logWidget.setStyleSheet("QScrollArea { background-color: #BBBBBB; }")
 
+        somethingButton = QPushButton("Mine")
+        somethingButton.clicked.connect(self.doSomething)
+
         layout = QVBoxLayout()
         layout.addWidget(self.accounts)
         layout.addWidget(rediscover)
         layout.addWidget(login)
+        layout.addWidget(somethingButton)
         layout.addWidget(self.logWidget)
 
         container = QWidget()
@@ -90,13 +111,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
         self.log("Booting...")
-        self.scanForLogins()
 
         self.rsManager = RSManager()
         self.discover()
 
     def selectWindow(self):
-        print("Selecting a window")
         a = self.accounts.currentText()
         self.rsManager.activateWindow(a)
 
@@ -104,6 +123,7 @@ class MainWindow(QMainWindow):
         self.logWidget.setText(self.logWidget.text() + "\n" + data)
 
     def discover(self):
+        self.log("Scanning for RuneScape Launcher and Clients...")
         self.accounts.clear()
         self.rsManager.discover()
         for launcher in self.rsManager.launchers:
@@ -124,8 +144,16 @@ class MainWindow(QMainWindow):
         except subprocess.CalledProcessError as e:
             self.log(f"Login failed with error: {e}")
 
-    def scanForLogins(self):
-        self.log("Scanning for logged in accounts...")
+    # This is a TEMP function, a TEMP one! It's supposed to be for tesing purposes only
+    def doSomething(self):
+        self.rsManager.activateWindow("[#] [izrbuz] RuneScape [#]")
+        time.sleep(3.0)    # Give time to move mouse to mining position
+        pos = pyautogui.position()
+        while True:
+            for n in range(10):
+                pyautogui.leftClick(pos)
+                time.sleep(3.5)
+            pyautogui.write("=")
 
 app = QApplication(sys.argv)
 
