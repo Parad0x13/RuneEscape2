@@ -78,6 +78,7 @@ class RSManager():
     def __init__(self):
         print("Creating RuneScape Manager")
 
+    # [BUG] Will grab any window that has RuneScape in it including YouTube videos lol
     def discover(self):
         self.launchers = pygetwindow.getWindowsWithTitle("Jagex Launcher")
         self.clients = pygetwindow.getWindowsWithTitle("RuneScape")
@@ -94,9 +95,9 @@ class RSManager():
 
         try:
             if window:
-                window.restore()
+                #window.restore()
                 window.activate()
-                window.maximize()    # [TODO] Should only maximized if it was already maximized
+                #window.maximize()    # [TODO] Should only maximized if it was already maximized
                 return True
         except:    # [TODO] Probably window was removed at some point, they will need to be purged
             print(f"Attempted to activate a window that does not exist {name}")
@@ -223,22 +224,36 @@ class MainWindow(QMainWindow):
             notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
 
     def doCombat(self):
-        window_title = self.accounts.currentText()
+        shouldToggleAll = True
+        windows = [self.accounts.currentText()]
+        if shouldToggleAll: windows = self.accounts.allItems()
+        notify(f"Starting Combat for windows: {windows}", audio = {"silent": "true"})
 
-        if self.rsManager.activateWindow(window_title):
-            notify("Starting Combat", audio = {"silent": "true"})
-            time.sleep(1.0)    # Generic get-ready wait
+        while True:
+            for window in windows:
+                if self.rsManager.activateWindow(window):
+                    if window == "RuneScape": continue
+                    #time.sleep(1.0)    # Generic get-ready wait
 
-            while True:
-                pyautogui.press(["space"])
-                pyautogui.press(["-"])
+                    pyautogui.press("c")
+                    #time.sleep(0.1)
 
-                pyautogui.press("`")
-                time.sleep(0.1)
-                pyautogui.press("subtract")
-                time.sleep(6.0)
-        else:
-            notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
+                    pyautogui.press("space")
+                    #time.sleep(0.5)
+                    pyautogui.press("-")
+                    #time.sleep(0.1)
+
+                    pyautogui.press("`")
+                    #time.sleep(0.1)
+                    pyautogui.press("subtract")
+                    #time.sleep(0.5)
+                else:
+                    notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
+
+            self.rsManager.activateWindow("RuneScape")
+            pyautogui.press("space")
+            time.sleep(6.0)    # Prepare to cycle again
+            #break
 
 app = QApplication(sys.argv)
 
