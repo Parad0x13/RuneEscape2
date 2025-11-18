@@ -209,19 +209,32 @@ class MainWindow(QMainWindow):
 
     # This is a TEMP function, a TEMP one! It's supposed to be for tesing purposes only
     def doMining(self):
-        window_title = self.accounts.currentText()
+        shouldToggleAll = True
+        windows = [self.accounts.currentText()]
+        if shouldToggleAll: windows = self.accounts.allItems()
+        notify(f"Starting Mining for windows: {windows}", audio = {"silent": "true"})
 
-        if self.rsManager.activateWindow(window_title):
-            notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
-            time.sleep(3.0)    # Give time to move mouse to mining position
-            pos = pyautogui.position()
-            while True:
-                for n in range(10):
-                    pyautogui.leftClick(pos)
-                    time.sleep(TICK * 4)
-                pyautogui.write("=")
-        else:
-            notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
+        i = 0
+        while True:
+            for window in windows:
+                if self.rsManager.activateWindow(window):
+                    if window == "RuneScape": continue
+
+                    time.sleep(0.1)
+                    pyautogui.leftClick(1250, 1100)
+                    if i % 10 == 0: pyautogui.press("=")
+                    #notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
+                    #time.sleep(3.0)    # Give time to move mouse to mining position
+                    #pos = pyautogui.position()
+                    #for n in range(10):
+                        #pyautogui.leftClick(pos)
+                        #time.sleep(TICK * 4)
+                    #pyautogui.write("=")
+                else:
+                    notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
+                time.sleep(TICK)
+            i += 1
+            time.sleep(TICK)
 
     def doCombat(self):
         shouldToggleAll = True
@@ -232,10 +245,10 @@ class MainWindow(QMainWindow):
         while True:
             for window in windows:
                 if self.rsManager.activateWindow(window):
-                    if window == "RuneScape": continue
+                    ###if window == "RuneScape": continue
                     #time.sleep(1.0)    # Generic get-ready wait
 
-                    pyautogui.press("c")
+                    ###pyautogui.press("c")
                     #time.sleep(0.1)
 
                     pyautogui.press("space")
