@@ -135,6 +135,9 @@ class MainWindow(QMainWindow):
         combatButton = QPushButton("Combat")
         combatButton.clicked.connect(self.doCombat)
 
+        alertButton = QPushButton("Activate Alerts")
+        alertButton.clicked.connect(self.doAlerts)
+
         layout = QVBoxLayout()
         layout.addWidget(self.accounts)
         layout.addWidget(focus)
@@ -142,6 +145,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(login)
         layout.addWidget(mineButton)
         layout.addWidget(combatButton)
+        layout.addWidget(alertButton)
         layout.addWidget(self.logWidget)
 
         container = QWidget()
@@ -221,7 +225,8 @@ class MainWindow(QMainWindow):
                     if window == "RuneScape": continue
 
                     time.sleep(0.1)
-                    pyautogui.leftClick(1250, 1100)
+                    #pyautogui.leftClick(1030, 790)    # Small screen, ... doesn't work it seems
+                    pyautogui.leftClick(1250, 1100)    # Large screen
                     if i % 10 == 0: pyautogui.press("=")
                     #notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
                     #time.sleep(3.0)    # Give time to move mouse to mining position
@@ -232,9 +237,9 @@ class MainWindow(QMainWindow):
                     #pyautogui.write("=")
                 else:
                     notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
-                time.sleep(TICK)
+                #time.sleep(TICK)
             i += 1
-            time.sleep(TICK)
+            time.sleep(TICK + TICK)
 
     def doCombat(self):
         shouldToggleAll = True
@@ -267,6 +272,24 @@ class MainWindow(QMainWindow):
             pyautogui.press("space")
             time.sleep(6.0)    # Prepare to cycle again
             #break
+
+    def doAlerts(self):
+        window = self.accounts.currentText()
+        if window == "": return
+
+        notify(f"Starting Alerts for window: {window}", audio = {"silent": "true"})
+        while True:
+            #if self.rsManager.activateWindow(window):
+            try:
+                #log = pyautogui.locateOnScreen("divIcon.png", confidence = 0.75)
+                log = pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\divIcon.png", confidence = 0.85)
+                print(log)
+            except:
+                print("Was unable to identify where the icon was...")
+                notify("Action stopped")
+                return
+
+            time.sleep(1.0)
 
 app = QApplication(sys.argv)
 
