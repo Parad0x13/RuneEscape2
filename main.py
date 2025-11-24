@@ -20,6 +20,8 @@ import win32ui
 
 from win11toast import toast, notify
 
+import pygame
+
 TICK = 0.6    # A standard RuneScape 'tick' is exactly 0.6 seconds long
 
 # Setup the event listener to kill the software entirely
@@ -138,6 +140,9 @@ class MainWindow(QMainWindow):
         alertButton = QPushButton("Activate Alerts")
         alertButton.clicked.connect(self.doAlerts)
 
+        divinationButton = QPushButton("Divination")
+        divinationButton.clicked.connect(self.doDivination)
+
         layout = QVBoxLayout()
         layout.addWidget(self.accounts)
         layout.addWidget(focus)
@@ -146,6 +151,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(mineButton)
         layout.addWidget(combatButton)
         layout.addWidget(alertButton)
+        layout.addWidget(divinationButton)
         layout.addWidget(self.logWidget)
 
         container = QWidget()
@@ -290,6 +296,24 @@ class MainWindow(QMainWindow):
                 return
 
             time.sleep(1.0)
+
+    def doDivination(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\harvest.png", confidence = 0.85)
+                pyautogui.leftClick()
+            except:
+                #notify("Divination Stopped")
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.play()
+                #return
+
+            time.sleep(TICK * 2)
 
 app = QApplication(sys.argv)
 
