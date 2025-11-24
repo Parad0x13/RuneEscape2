@@ -6,6 +6,7 @@ import threading
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QLineEdit, QScrollArea, QComboBox
+from PyQt6 import QtGui
 
 import pygetwindow
 
@@ -143,6 +144,13 @@ class MainWindow(QMainWindow):
         divinationButton = QPushButton("Divination")
         divinationButton.clicked.connect(self.doDivination)
 
+        quickMineButton = QPushButton("Quick Mine")
+        quickMineButton.clicked.connect(self.doQuickMine)
+
+        quickCombat = QPushButton("Quick Combat")
+        quickCombat.clicked.connect(
+            self.doQuickCombat)
+
         layout = QVBoxLayout()
         layout.addWidget(self.accounts)
         layout.addWidget(focus)
@@ -152,6 +160,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(combatButton)
         layout.addWidget(alertButton)
         layout.addWidget(divinationButton)
+        layout.addWidget(quickMineButton)
+        layout.addWidget(quickCombat)
         layout.addWidget(self.logWidget)
 
         container = QWidget()
@@ -314,6 +324,48 @@ class MainWindow(QMainWindow):
                 #return
 
             time.sleep(TICK * 2)
+
+    def doQuickMine(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        i = 0
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\mine.png", confidence = 0.85)
+                pyautogui.leftClick()
+            except:
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.play()
+
+            i += 1
+            if i % 10 == 0:
+                i = 0
+                pyautogui.press("=")
+
+            time.sleep(TICK * 4)
+
+    def doQuickCombat(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        pyautogui.press("c")    # Open loot pickup [BUG] This may not open right away... may need to do it again`- `
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\combatIcon.png", confidence = 0.85)
+            except:
+                pyautogui.press("`")    # Cycle Target Forward
+                pyautogui.press("subtract")    # Fight simple attack
+                pyautogui.press("space")    # Pickup loot
+
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.play()
+
+            time.sleep(1.0)
 
 app = QApplication(sys.argv)
 
