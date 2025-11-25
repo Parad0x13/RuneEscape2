@@ -148,8 +148,13 @@ class MainWindow(QMainWindow):
         quickMineButton.clicked.connect(self.doQuickMine)
 
         quickCombat = QPushButton("Quick Combat")
-        quickCombat.clicked.connect(
-            self.doQuickCombat)
+        quickCombat.clicked.connect(self.doQuickCombat)
+
+        quickThieving = QPushButton("Quick Thieving")
+        quickThieving.clicked.connect(self.doQuickThieving)
+
+        keepAlive = QPushButton("Keep Alive")
+        keepAlive.clicked.connect(self.keepAlive)
 
         layout = QVBoxLayout()
         layout.addWidget(self.accounts)
@@ -162,6 +167,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(divinationButton)
         layout.addWidget(quickMineButton)
         layout.addWidget(quickCombat)
+        layout.addWidget(quickThieving)
+        layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
         container = QWidget()
@@ -320,6 +327,7 @@ class MainWindow(QMainWindow):
                 #notify("Divination Stopped")
                 pygame.mixer.init()
                 pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.set_volume(0.25)
                 pygame.mixer.music.play()
                 #return
 
@@ -338,6 +346,7 @@ class MainWindow(QMainWindow):
             except:
                 pygame.mixer.init()
                 pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.set_volume(0.25)
                 pygame.mixer.music.play()
 
             i += 1
@@ -356,6 +365,7 @@ class MainWindow(QMainWindow):
         while True:
             try:
                 pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\combatIcon.png", confidence = 0.85)
+                pyautogui.press("subtract")    # Fight simple attack
             except:
                 pyautogui.press("`")    # Cycle Target Forward
                 pyautogui.press("subtract")    # Fight simple attack
@@ -363,9 +373,48 @@ class MainWindow(QMainWindow):
 
                 pygame.mixer.init()
                 pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
-                pygame.mixer.music.play()
+                pygame.mixer.music.set_volume(0.25)
+                #pygame.mixer.music.play()
 
             time.sleep(1.0)
+
+    # [BUG] This will never work properly if they have their skill tab open...
+    def doQuickThieving(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\thieving.png", confidence = 0.85)
+            except:
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.set_volume(0.25)
+                pygame.mixer.music.play()
+
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\stunned.png", confidence = 0.85)
+
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\glass.mp3")
+                pygame.mixer.music.set_volume(0.25)
+                pygame.mixer.music.play()
+            except:
+                pass
+
+            time.sleep(1.0)
+
+    def keepAlive(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        while True:
+            pyautogui.rightClick(1000, 1000)
+            time.sleep(1.0)
+            pyautogui.rightClick(1000, 800)
+            time.sleep(60.0)
 
 app = QApplication(sys.argv)
 
