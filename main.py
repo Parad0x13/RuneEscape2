@@ -153,6 +153,9 @@ class MainWindow(QMainWindow):
         quickThieving = QPushButton("Quick Thieving")
         quickThieving.clicked.connect(self.doQuickThieving)
 
+        quickHoliday = QPushButton("Quick Holiday")
+        quickHoliday.clicked.connect(self.doQuickHoliday)
+
         keepAlive = QPushButton("Keep Alive")
         keepAlive.clicked.connect(self.keepAlive)
 
@@ -168,6 +171,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(quickMineButton)
         layout.addWidget(quickCombat)
         layout.addWidget(quickThieving)
+        layout.addWidget(quickHoliday)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
@@ -404,6 +408,22 @@ class MainWindow(QMainWindow):
                 pass
 
             time.sleep(1.0)
+
+    def doQuickHoliday(self):
+        window = self.accounts.currentText()
+        if window == "": return
+        self.rsManager.activateWindow(window)
+
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\fishing.png", confidence = 0.85)
+            except:
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.set_volume(0.25)
+                pygame.mixer.music.play()
+
+            time.sleep(TICK * 4)
 
     def keepAlive(self):
         window = self.accounts.currentText()
