@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(quickCombat)
         layout.addWidget(quickThieving)
         layout.addWidget(quickHoliday)
-        layout.addWidget(quickTrade)
+        #layout.addWidget(quickTrade)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
@@ -192,6 +192,12 @@ class MainWindow(QMainWindow):
         self.discoverThread.daemon = True
         self.discoverThread.start()
         #self.discover()
+
+        ############
+        h = pynput.keyboard.HotKey(pynput.keyboard.HotKey.parse("`"), self.doQuick)    # ctrl+alt+r emulates the QoL.ahk reset
+        el = pynput.keyboard.Listener(on_press = for_canonical(h.press), on_release = for_canonical(h.release))
+        el.start()
+        ############
 
     def selectWindow(self):
         a = self.accounts.currentText()
@@ -473,6 +479,14 @@ class MainWindow(QMainWindow):
                 self.rsManager.activateWindow("RuneScape")
 
             time.sleep(TICK * 4)
+
+    # [BUG] This doesn't work...
+    def doQuick(self):
+        pass
+        pyautogui.rightClick(950, 575)
+        pyautogui.moveRel(0, 130)
+        pyautogui.leftClick()
+        pyautogui.moveRel(80, 0)
 
 app = QApplication(sys.argv)
 
