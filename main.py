@@ -156,6 +156,9 @@ class MainWindow(QMainWindow):
         quickHoliday = QPushButton("Quick Holiday")
         quickHoliday.clicked.connect(self.doQuickHoliday)
 
+        quickTrade = QPushButton("Quick Trade")
+        quickTrade.clicked.connect(self.quickTrade)
+
         keepAlive = QPushButton("Keep Alive")
         keepAlive.clicked.connect(self.keepAlive)
 
@@ -172,6 +175,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(quickCombat)
         layout.addWidget(quickThieving)
         layout.addWidget(quickHoliday)
+        layout.addWidget(quickTrade)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
@@ -435,6 +439,40 @@ class MainWindow(QMainWindow):
             time.sleep(1.0)
             pyautogui.rightClick(1000, 800)
             time.sleep(60.0)
+
+    # [BUG] [TODO] This assumes RuneScape is the one it needs, and that a sandbox is selected. This is not normal
+    # [NOTE] We will assume parent has already tried to trade child
+    # [NOTE] Reconvene this later if I care to
+    def quickTrade(self):
+        window = self.accounts.currentText()
+        if window == "": return
+
+        a = window
+        b = "RuneScape"
+        if a == b: return
+
+        notify(f"Trading between {a} and {b}")
+        self.rsManager.activateWindow(window)
+
+        while True:
+            try:
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\tradingWith.png", confidence = 0.85)
+            except:
+                pygame.mixer.init()
+                pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                pygame.mixer.music.set_volume(0.25)
+                pygame.mixer.music.play()
+
+                pyautogui.leftClick(1040, 850)    # Deposit All
+                time.sleep(1.0)
+
+                self.rsManager.activateWindow("RuneScape")
+
+                return
+
+                self.rsManager.activateWindow("RuneScape")
+
+            time.sleep(TICK * 4)
 
 app = QApplication(sys.argv)
 
