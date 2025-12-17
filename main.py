@@ -507,11 +507,17 @@ class MainWindow(QMainWindow):
         if window == "": return
 
         while True:
+            current_window = pyautogui.getActiveWindow()
+            print(f"Current window is {current_window.title}")
+
             self.rsManager.activateWindow(window)
             time.sleep(1.0)
             pyautogui.leftClick(1000, 400)
             time.sleep(2.0)
             pyautogui.leftClick(700, 600)
+            time.sleep(1.0)
+
+            self.rsManager.activateWindow(current_window.title)
             time.sleep(40.0)
 
 app = QApplication(sys.argv)
