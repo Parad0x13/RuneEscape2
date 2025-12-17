@@ -159,6 +159,9 @@ class MainWindow(QMainWindow):
         quickTrade = QPushButton("Quick Trade")
         quickTrade.clicked.connect(self.quickTrade)
 
+        quickSmelt = QPushButton("Quick Smelt")
+        quickSmelt.clicked.connect(self.doQuickSmelt)
+
         keepAlive = QPushButton("Keep Alive")
         keepAlive.clicked.connect(self.keepAlive)
 
@@ -176,6 +179,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(quickHoliday)
         layout.addWidget(quickCombat)
         #layout.addWidget(quickTrade)
+        layout.addWidget(quickSmelt)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
@@ -497,6 +501,18 @@ class MainWindow(QMainWindow):
         #    pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
         #    pygame.mixer.music.set_volume(0.25)
         #    pygame.mixer.music.play()
+
+    def doQuickSmelt(self):
+        window = self.accounts.currentText()
+        if window == "": return
+
+        while True:
+            self.rsManager.activateWindow(window)
+            time.sleep(1.0)
+            pyautogui.leftClick(1000, 400)
+            time.sleep(2.0)
+            pyautogui.leftClick(700, 600)
+            time.sleep(40.0)
 
 app = QApplication(sys.argv)
 
