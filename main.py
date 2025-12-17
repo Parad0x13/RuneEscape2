@@ -172,9 +172,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(alertButton)
         layout.addWidget(divinationButton)
         layout.addWidget(quickMineButton)
-        layout.addWidget(quickCombat)
         layout.addWidget(quickThieving)
         layout.addWidget(quickHoliday)
+        layout.addWidget(quickCombat)
         #layout.addWidget(quickTrade)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
@@ -194,7 +194,8 @@ class MainWindow(QMainWindow):
         #self.discover()
 
         ############
-        h = pynput.keyboard.HotKey(pynput.keyboard.HotKey.parse("`"), self.doQuick)    # ctrl+alt+r emulates the QoL.ahk reset
+        # [BUG] Remove this cause it interrupts with QoL.ahk
+        h = pynput.keyboard.HotKey(pynput.keyboard.HotKey.parse("<ctrl>+<alt>+i"), self.doQuick)
         el = pynput.keyboard.Listener(on_press = for_canonical(h.press), on_release = for_canonical(h.release))
         el.start()
         ############
@@ -258,12 +259,13 @@ class MainWindow(QMainWindow):
         i = 0
         while True:
             for window in windows:
+                if window == "RuneScape": continue
+                if "#" not in window: continue    # [NOTE] This is a temp solution to windows that work, but aren't RuneScape (like YouTube video tabs)
                 if self.rsManager.activateWindow(window):
-                    if window == "RuneScape": continue
-
                     time.sleep(0.1)
                     #pyautogui.leftClick(1030, 790)    # Small screen, ... doesn't work it seems
-                    pyautogui.leftClick(1250, 1100)    # Large screen
+                    #pyautogui.leftClick(1250, 1100)    # Large screen
+                    pyautogui.leftClick(1080, 430)    # Large screen
                     if i % 10 == 0: pyautogui.press("=")
                     #notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
                     #time.sleep(3.0)    # Give time to move mouse to mining position
@@ -378,7 +380,7 @@ class MainWindow(QMainWindow):
         pyautogui.press("c")    # Open loot pickup [BUG] This may not open right away... may need to do it again`- `
         while True:
             try:
-                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\combatIcon.png", confidence = 0.85)
+                pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\combatIcon.png", confidence = 0.50)
                 pyautogui.press("subtract")    # Fight simple attack
             except:
                 pyautogui.press("`")    # Cycle Target Forward
@@ -390,7 +392,7 @@ class MainWindow(QMainWindow):
                 pygame.mixer.music.set_volume(0.25)
                 #pygame.mixer.music.play()
 
-            time.sleep(1.0)
+            time.sleep(2.5)
 
     # [BUG] This will never work properly if they have their skill tab open...
     def doQuickThieving(self):
@@ -480,13 +482,21 @@ class MainWindow(QMainWindow):
 
             time.sleep(TICK * 4)
 
-    # [BUG] This doesn't work...
     def doQuick(self):
+        #window = self.accounts.currentText()
+        #if window == "": return
+        #self.rsManager.activateWindow(window)
+
         pass
-        pyautogui.rightClick(950, 575)
-        pyautogui.moveRel(0, 130)
-        pyautogui.leftClick()
-        pyautogui.moveRel(80, 0)
+        #try:
+        #    t = pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\buyAll.png", confidence = 0.85)
+        #    t = pyautogui.center(t)
+        #    pyautogui.leftClick(t)
+        #except:
+        #    pygame.mixer.init()
+        #    pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+        #    pygame.mixer.music.set_volume(0.25)
+        #    pygame.mixer.music.play()
 
 app = QApplication(sys.argv)
 
