@@ -162,6 +162,9 @@ class MainWindow(QMainWindow):
         quickSmelt = QPushButton("Quick Smelt")
         quickSmelt.clicked.connect(self.doQuickSmelt)
 
+        chickens = QPushButton("Chickens")
+        chickens.clicked.connect(self.doChickens)
+
         keepAlive = QPushButton("Keep Alive")
         keepAlive.clicked.connect(self.keepAlive)
 
@@ -180,6 +183,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(quickCombat)
         #layout.addWidget(quickTrade)
         layout.addWidget(quickSmelt)
+        layout.addWidget(chickens)
         layout.addWidget(keepAlive)
         layout.addWidget(self.logWidget)
 
@@ -373,6 +377,7 @@ class MainWindow(QMainWindow):
             if i % 10 == 0:
                 i = 0
                 pyautogui.press("=")
+            #if i % 10 == 0: return    # End just incase
 
             time.sleep(TICK * 4)
 
@@ -507,18 +512,49 @@ class MainWindow(QMainWindow):
         if window == "": return
 
         while True:
+            pygame.mixer.init()
+            pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+            pygame.mixer.music.set_volume(0.25)
+            pygame.mixer.music.play()
+            time.sleep(2.0)
+
             current_window = pyautogui.getActiveWindow()
-            print(f"Current window is {current_window.title}")
 
             self.rsManager.activateWindow(window)
+            time.sleep(1.5)
+            pyautogui.leftClick(1000, 400)
             time.sleep(1.0)
             pyautogui.leftClick(1000, 400)
             time.sleep(2.0)
             pyautogui.leftClick(700, 600)
-            time.sleep(1.0)
+            #time.sleep(1.0)
 
             self.rsManager.activateWindow(current_window.title)
-            time.sleep(40.0)
+            time.sleep(38.0)
+
+    def doChickens(self):
+        window = self.accounts.currentText()
+        if window == "": return
+
+        self.rsManager.activateWindow(window)
+
+        i = 0
+        while True:
+            pyautogui.press("`")    # Cycle Target Forward
+            pyautogui.press("subtract")    # Fight simple attack
+            pyautogui.press("space")    # Pickup loot
+            for n in range(4):
+                pyautogui.press("-")    # Bury bone
+                time.sleep(0.1)
+
+            if i % 10 == 0:
+                i = 0
+                pyautogui.leftClick(1975, 680)
+                time.sleep(0.5)
+                pyautogui.leftClick(1975, 750)
+
+            i += 1
+            time.sleep(2.0)
 
 app = QApplication(sys.argv)
 
