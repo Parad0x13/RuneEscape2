@@ -265,28 +265,36 @@ class MainWindow(QMainWindow):
         notify(f"Starting Mining for windows: {windows}", audio = {"silent": "true"})
 
         i = 0
+        delayed = 0
+        shouldNote = False
         while True:
+            shouldNote = False
+            #if i % 6 == 0:
+            if i % 1 == 0:
+                i = 0
+                shouldNote = True
+            i += 1
+
             for window in windows:
                 if window == "RuneScape": continue
                 if "#" not in window: continue    # [NOTE] This is a temp solution to windows that work, but aren't RuneScape (like YouTube video tabs)
                 if self.rsManager.activateWindow(window):
-                    time.sleep(0.1)
-                    #pyautogui.leftClick(1030, 790)    # Small screen, ... doesn't work it seems
-                    #pyautogui.leftClick(1250, 1100)    # Large screen
-                    pyautogui.leftClick(1080, 430)    # Large screen
-                    if i % 10 == 0: pyautogui.press("=")
-                    #notify("Starting Mining\nHover cursor over node", audio = {"silent": "true"})
-                    #time.sleep(3.0)    # Give time to move mouse to mining position
-                    #pos = pyautogui.position()
-                    #for n in range(10):
-                        #pyautogui.leftClick(pos)
-                        #time.sleep(TICK * 4)
-                    #pyautogui.write("=")
+                    if shouldNote:
+                        time.sleep(0.5)
+                        pyautogui.leftClick(1975, 680)
+                        time.sleep(0.5)
+                        pyautogui.leftClick(1975, 750)
+                        time.sleep(0.5)
+                        delayed += 0.5 * 3
+
+                    time.sleep(0.25)
+                    delayed += 0.25
+                    pyautogui.leftClick(1040, 360)    # Click on ore
+                    pyautogui.leftClick(1040, 360)    # Click on ore
                 else:
                     notify("No RuneScape client selected", audio = {"silent": "true"}, duration = "short")
                 #time.sleep(TICK)
-            i += 1
-            time.sleep(TICK + TICK)
+            time.sleep(TICK * 4 * 9 - delayed)
 
     def doCombat(self):
         shouldToggleAll = True
@@ -536,25 +544,22 @@ class MainWindow(QMainWindow):
         window = self.accounts.currentText()
         if window == "": return
 
-        self.rsManager.activateWindow(window)
+        botCycleCount = {}
+        botCycleCount["ogwizg"] = 9
 
-        i = 0
         while True:
-            pyautogui.press("`")    # Cycle Target Forward
-            pyautogui.press("subtract")    # Fight simple attack
-            pyautogui.press("space")    # Pickup loot
-            for n in range(4):
-                pyautogui.press("-")    # Bury bone
-                time.sleep(0.1)
+            self.rsManager.activateWindow(window)
 
-            if i % 10 == 0:
-                i = 0
-                pyautogui.leftClick(1975, 680)
-                time.sleep(0.5)
-                pyautogui.leftClick(1975, 750)
+            # Try to note stuff
+            pyautogui.leftClick(1975, 680)
+            time.sleep(0.5)
+            pyautogui.leftClick(1975, 750)
+            time.sleep(0.5)
 
-            i += 1
-            time.sleep(2.0)
+            for _ in range(4):
+                pyautogui.leftClick(1040, 360)    # Click on ore
+                pyautogui.leftClick(1040, 360)    # Click on ore
+                time.sleep(TICK * 4 * 9)
 
 app = QApplication(sys.argv)
 
