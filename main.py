@@ -86,6 +86,7 @@ class RSManager():
         self.launchers = pygetwindow.getWindowsWithTitle("Jagex Launcher")
         self.clients = pygetwindow.getWindowsWithTitle("RuneScape")
 
+    # [TODO] Make it so that it activates even if window is minimized
     def activateWindow(self, name) -> bool:
         window = None
 
@@ -122,8 +123,10 @@ class MainWindow(QMainWindow):
         focus = QPushButton("Focus Window")
         focus.clicked.connect(self.selectWindow)
 
+        # [TODO] Refactor this so that knownBots and knownAccounts work better together, refactor one out
         self.knownAccounts = QComboBox()
-        for account in ["nsydoa", "qpldek", "tviyet", "yjargo", "izrbuz"]:
+        self.knownBots = ["nsydoa", "qpldek", "yjargo", "izrbuz", "okgiba", "zajtii", "ogwizg", "cajbew", "lanbuh"]
+        for account in self.knownBots:
             self.knownAccounts.addItem(account)
 
         login = QPushButton("Login to Account")
@@ -516,29 +519,65 @@ class MainWindow(QMainWindow):
         #    pygame.mixer.music.play()
 
     def doQuickSmelt(self):
-        window = self.accounts.currentText()
-        if window == "": return
+        shouldToggleAll = True
+        botWindows = []
+        # Only go through windows that are bot accounts (And specifically not launcher windows)
+        for window in self.accounts.allItems():
+            for bot in self.knownBots:
+                if bot in window:
+                    if "Launcher" in window: continue
+                    botWindows.append(window)
 
         while True:
-            pygame.mixer.init()
-            pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
-            pygame.mixer.music.set_volume(0.25)
-            pygame.mixer.music.play()
-            time.sleep(2.0)
+            botsToPurge = []
 
-            current_window = pyautogui.getActiveWindow()
+            for bot in botWindows:
+                self.rsManager.activateWindow(bot)
+                time.sleep(0.25)    # Give the window time to show up at least
 
-            self.rsManager.activateWindow(window)
-            time.sleep(1.5)
-            pyautogui.leftClick(1000, 400)
-            time.sleep(1.0)
-            pyautogui.leftClick(1000, 400)
-            time.sleep(2.0)
-            pyautogui.leftClick(700, 600)
-            #time.sleep(1.0)
+                # Check if we are in front of a smelter
+                pyautogui.moveTo(950, 400)    # Move mouse to location of smelter
+                try:
+                    pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\SmeltFurnace.png", confidence = 0.85)
+                    pyautogui.rightClick()
+                    time.sleep(0.25)
+                    pyautogui.moveRel(0, 60)    # Move to deposit all
+                    time.sleep(0.25)
+                    pyautogui.leftClick()
+                    time.sleep(0.5)
+                    pyautogui.leftClick()
+                    time.sleep(2.0)    # [TODO] [BUG] Try to account for server latency, however this may not be sufficient
 
-            self.rsManager.activateWindow(current_window.title)
-            time.sleep(38.0)
+                    # [TODO] Streamline nested screen searches. Do not do this the stupid if else way
+                    try:
+                        pyautogui.locateOnScreen("C:\\Users\\bryan\\Desktop\\RuneEscape2\\BeginProject.png", confidence = 0.85)
+                        pyautogui.typewrite(" ")
+                    except:
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                        pygame.mixer.music.set_volume(0.25)
+                        pygame.mixer.music.play()
+
+                        # This means the bot is no longer working, we can remove it from the stack
+                        botsToPurge.append(bot)
+                except:
+                    pygame.mixer.init()
+                    pygame.mixer.music.load("C:\\Users\\bryan\\Desktop\\RuneEscape2\\beep.mp3")
+                    pygame.mixer.music.set_volume(0.25)
+                    pygame.mixer.music.play()
+
+                    # This means the bot is no longer working, we can remove it from the stack
+                    botsToPurge.append(bot)
+
+            for bot in botsToPurge:
+                print(f"Purging bot from queue: {bot}")
+                botWindows.remove(bot)
+
+            if len(botWindows) == 0:
+                print("No more bots, returning from Quick Smelt")
+                return    # In the event all bots have failed
+
+            time.sleep(60.0)    # Wait for each bot to finish an average inventory
 
     def doChickens(self):
         window = self.accounts.currentText()
